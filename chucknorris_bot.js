@@ -48,7 +48,10 @@ const scrapeChuckNorrisJokes = async () => {
   try {
     const response = await axios.get('https://parade.com/968666/parade/chuck-norris-jokes/', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
       },
     });
     const $ = cheerio.load(response.data);
@@ -131,12 +134,12 @@ bot.hears(/^\d+$/, async (ctx) => {
   console.log("number of a joke: ", index)
   console.log("the jokes:", jokes)
   // Check if the index is valid
-  if (isNaN(index)){
-    ctx.reply('did not got accecss to jokes');
-    return;
-  }
+  //if () {
+  //  ctx.reply('did not got accecss to jokes');
+  //  return;
+  // }
 
-  if ( index < 1 || index > jokes.length) {
+  if (isNaN(index) || index < 1 || index > jokes.length) {
     ctx.reply('Please provide a valid index between 1 and 101.');
     return;
   }
@@ -148,7 +151,7 @@ bot.hears(/^\d+$/, async (ctx) => {
   const translatedJoke = await translateText(selectedJoke, targetLanguage);
 
   // Reply to the user with the translated joke
-  ctx.reply(`Chuck Norris Joke (${targetLanguage}): ${translatedJoke}`);
+  ctx.reply(translatedJoke);
 });
 
 // Start the bot

@@ -174,7 +174,7 @@ bot.start(async (ctx) => {
   Example usage:
   - Set language to hebrew:
    "${NO_TRANSLATE_PLACEHOLDER}set ${NO_TRANSLATE_PLACEHOLDER}language ${NO_TRANSLATE_PLACEHOLDER}hebrew"
-  - Get Chuck Norris joke #5 in Hebrew
+  - Get Chuck Norris joke #5 in Hebrew: 5
 
   Enjoy the jokes!
   `;
@@ -200,7 +200,7 @@ bot.help(async (ctx) => {
   Example usage:
   - Set language to Hebrew:
    "${NO_TRANSLATE_PLACEHOLDER}set ${NO_TRANSLATE_PLACEHOLDER}language ${NO_TRANSLATE_PLACEHOLDER}hebrew"
-  - Get Chuck Norris joke #5 in Hebrew
+  - Get Chuck Norris joke #5 in Hebrew: 5
   `;
 
   const translatedHelpMessage = await translateText(helpMessage, targetLanguage);

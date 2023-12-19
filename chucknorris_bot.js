@@ -10,6 +10,7 @@ const userSettings = {};
 
 // Set default language to English
 const defaultLanguage = 'en';
+
 userSettings.defaultLanguage = defaultLanguage;
 
 // Azure Translation API key
@@ -47,11 +48,11 @@ const fetchSupportedLanguages = async () => {
 
 // Function to get language code from full language name
 const getLanguageCode = (languageName) => {
-  return languageMapping[languageName.toLowerCase()] || languageName;
+  return languageMapping[languageName.toLowerCase()] || "";
 };
 
 // Function for getting list of Chuck Norris joke
-const scrapeChuckNorrisJokes = async () => {
+const scrapeChuckNorrisJokes = async (ctx) => {
   try {
     const response = await axios.get('https://parade.com/968666/parade/chuck-norris-jokes/', {
       headers: {
@@ -100,33 +101,40 @@ const translateText = async (text, targetLanguage) => {
     );
     return translationResponse.data[0].translations[0].text;
   } catch (error) {
-    ctx.reply('Sorry, there was a problem the translation. Please ensure your language setting is configured correctly.');
-    console.error('Error translating text:', error.message);
-    return text;
+    const errorMessage = "Sorry, there was a problem with the translation. Please ensure your language setting is configured correctly.";
+    return `${text}\n${errorMessage}`;
   }
 };
 
 // Function to handle the user request to set language
 bot.hears(/^set language (.+)$/i, async (ctx) => {
   const targetLanguageName = ctx.match[1];
+  translatedResponse = "";
 
   if (Object.keys(languageMapping).length === 0) {
     await fetchSupportedLanguages();
   }
 
-  const targetLanguage = getLanguageCode(targetLanguageName);
-
-  const translatedResponse = await translateText('No problem!', targetLanguage);
-
-  userSettings[ctx.message.from.id] = targetLanguage;
-
+  const targetLanguage = getLanguageCode(targetLanguageName,);
+  if (targetLanguage == "") {
+    translatedResponse = await translateText('Please enter a valid language', userSettings[ctx.message.from.id]);
+  }
+  else {
+    translatedResponse = await translateText('No problem!', targetLanguage);
+    userSettings[ctx.message.from.id] = targetLanguage;
+  }
   ctx.reply(translatedResponse);
 });
 
 // Function to handle the user request for a joke
 bot.hears(/^\d+$/, async (ctx) => {
   const userId = ctx.message.from.id;
-  const targetLanguage = userSettings[userId];
+
+  let targetLanguage = userSettings[userId];
+
+  if (!targetLanguage) {
+    targetLanguage = 'en';
+  }
 
   const jokes = await scrapeChuckNorrisJokes();
 
@@ -189,8 +197,8 @@ bot.start(async (ctx) => {
 // Function to handle the "/help" command
 bot.help(async (ctx) => {
   const userId = ctx.message.from.id;
-  const targetLanguage = userSettings[userId] || userSettings.defaultLanguage || 'en';
 
+  const targetLanguage = userSettings[userId] || userSettings.defaultLanguage || 'en';
   const helpMessage = `
   This bot can do the following:
   - Set your preferred language using the command
@@ -213,6 +221,7 @@ bot.help(async (ctx) => {
 //Function to handle invalid commands and texts
 bot.on('text', async (ctx) => {
   const userId = ctx.message.from.id;
+
   const targetLanguage = userSettings[userId] || userSettings.defaultLanguage || 'en';
 
   const errorMessage = 'Sorry, I didn\'t understand that command. Please use a valid command or type "/help" for assistance.';
